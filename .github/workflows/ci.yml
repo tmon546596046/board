@@ -55,7 +55,7 @@ jobs:
       - run: sed -i -e '/kube_http_scheme/c\kube_http_scheme=https' -e "/kube_master_ip/c\kube_master_ip=${KUBE_MASTER_IP}" -e "/kube_master_port/c\kube_master_port=${KUBE_MASTER_PORT}" make/board.cfg 
       - run: docker-compose -f tests/docker-compose.uibuilder.test.yml up
       - run: bash -c 'function uitest(){ code=$(docker inspect tests_uibuilder7.4_1 -f "{{.State.ExitCode}}"); return $code; }; uitest'
-      - run: cat /etc/board/cert/ca.pem && cat /etc/board/cert/ca-key.pem
+      - run: sudo ls /etc/board/cert && whoami && sudo cat /etc/board/cert/ca.pem && sudo cat /etc/board/cert/ca-key.pem
       - run: sudo make prepare
       - run: source tests/env.cfg
       - run: cp tests/docker-compose.test.yml make/dev
