@@ -11,6 +11,9 @@ jobs:
     name: Board CI
     # Set the type of machine to run on
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: /home/runner/go/src/git/inspursoft/board
     # Set the environment for the job
     env:
       GO111MODULE: "off"
@@ -19,11 +22,13 @@ jobs:
       registry: "quay.io/piranhahu"
 
     steps:
-      - uses: actions/checkout@v2
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
           go-version: 1.14
+      - uses: actions/checkout@v2
+        with:
+          path: /home/runner/go/src/git/inspursoft/board
       - run: export GOROOT=$(go env GOROOT)
       - run: curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64 && chmod +x ./kind && sudo mv ./kind /usr/local/bin/kind
       - run: curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl" && chmod +x ./kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
@@ -50,6 +55,7 @@ jobs:
       - run: sed -i -e '/kube_http_scheme/c\kube_http_scheme=https' -e "/kube_master_ip/c\kube_master_ip=${KUBE_MASTER_IP}" -e "/kube_master_port/c\kube_master_port=${KUBE_MASTER_PORT}" make/board.cfg 
       - run: docker-compose -f tests/docker-compose.uibuilder.test.yml up
       - run: bash -c 'function uitest(){ code=$(docker inspect tests_uibuilder7.4_1 -f "{{.State.ExitCode}}"); return $code; }; uitest'
+      - run: cat /etc/board/cert/ca.pem && cat /etc/board/cert/ca-key.pem
       - run: sudo make prepare
       - run: source tests/env.cfg
       - run: cp tests/docker-compose.test.yml make/dev
