@@ -55,13 +55,13 @@ def delfile(src):
 def create_cert(conf_path, key_path="/data/board/cert/board-key.pem", cert_path="/data/board/cert/board.pem", ca_key="/etc/board/cert/ca-key.pem", ca_cert="/etc/board/cert/ca.pem"):
 	cert_dir = os.path.dirname(cert_path)
 	csr_path = os.path.join(cert_dir, "request.csr")
-	rc = subprocess.call(["openssl", "genrsa", "-out", key_path, "2048"], stdout=subprocess.STDOUT, stderr=subprocess.STDOUT)
+	rc = subprocess.call(["openssl", "genrsa", "-out", key_path, "2048"], stdout=subprocess.STDOUT)
 	if rc != 0:
 		return rc
-	rc = subprocess.call(["openssl", "req", "-new", "-key", key_path, "-out", csr_path, "-config", conf_path], stdout=subprocess.STDOUT, stderr=subprocess.STDOUT)
+	rc = subprocess.call(["openssl", "req", "-new", "-key", key_path, "-out", csr_path, "-config", conf_path], stdout=subprocess.STDOUT)
 	if rc != 0:
 		return rc
-	return subprocess.call(["openssl", "x509", "-req", "-in", csr_path, "-CA", ca_cert, "-CAkey", ca_key, "-CAcreateserial", "-out", cert_path, "-days", "10000", "-extensions", "v3_ext", "-extfile", conf_path], stdout=subprocess.STDOUT, stderr=subprocess.STDOUT)
+	return subprocess.call(["openssl", "x509", "-req", "-in", csr_path, "-CA", ca_cert, "-CAkey", ca_key, "-CAcreateserial", "-out", cert_path, "-days", "10000", "-extensions", "v3_ext", "-extfile", conf_path], stdout=subprocess.STDOUT)
 
 def create_basic_auth(elastic_password):
 	return subprocess.check_output("""echo -n "elastic:""" + elastic_password + """" | openssl base64""", shell=True, stderr=subprocess.STDOUT)
