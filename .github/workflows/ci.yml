@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: /home/runner/go/src/git/inspursoft/board
+        working-directory: /home/runner/work/board/board/go/src/git/inspursoft/board
     # Set the environment for the job
     env:
       GO111MODULE: "off"
@@ -28,8 +28,8 @@ jobs:
           go-version: 1.14
       - uses: actions/checkout@v2
         with:
-          path: /home/runner/go/src/git/inspursoft/board
-      - run: export GOROOT=$(go env GOROOT)
+          path: go/src/git/inspursoft/board
+      - run: export GOROOT=$(go env GOROOT) && export GOPAHT=/home/runner/work/board/board/go
       - run: curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64 && chmod +x ./kind && sudo mv ./kind /usr/local/bin/kind
       - run: curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl" && chmod +x ./kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
       - run: python -V
