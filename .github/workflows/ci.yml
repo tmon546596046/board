@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           path: go/src/git/inspursoft/board
-      - run: export GOROOT=$(go env GOROOT) && export GOPAHT=/home/runner/work/board/board/go
+      - run: echo "GOROOT=$(go env GOROOT)" >> $GITHUB_ENV && echo "GOPAHT=/home/runner/work/board/board/go" >> $GITHUB_ENV
       - run: curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64 && chmod +x ./kind && sudo mv ./kind /usr/local/bin/kind
       - run: curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl" && chmod +x ./kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
       - run: python -V
@@ -48,8 +48,8 @@ jobs:
       - run: sudo mkdir -p /etc/board/cert /data/board/cert
       - run: sudo docker cp kind-control-plane:/etc/kubernetes/pki/ca.crt /etc/board/cert/ca.pem
       - run: sudo docker cp kind-control-plane:/etc/kubernetes/pki/ca.key /etc/board/cert/ca-key.pem
-      - run: export KUBE_MASTER_PORT=6443
-      - run: while true; do masterip=$(docker inspect kind-control-plane  -f '{{.NetworkSettings.Networks.kind.IPAddress}}'); if [ -n "$masterip" ]; then break; fi; sleep 2; done && export KUBE_MASTER_IP=$(docker inspect kind-control-plane  -f '{{.NetworkSettings.Networks.kind.IPAddress}}')
+      - run: echo "KUBE_MASTER_PORT=6443" >> $GITHUB_ENV
+      - run: echo "KUBE_MASTER_IP=$(docker inspect kind-control-plane  -f '{{.NetworkSettings.Networks.kind.IPAddress}}')" >> $GITHUB_ENV
       - run: echo "master ip is $KUBE_MASTER_IP"
       - run: sed -i -e 's/KUBE_MASTER_IP=10.110.27.103/KUBE_MASTER_IP=${KUBE_MASTER_IP}/g' -e "s/KUBE_MASTER_PORT=51926/KUBE_MASTER_PORT=${KUBE_MASTER_PORT}/g" -e "s/NODE_IP=10.110.27.103/NODE_IP=kind-control-plane/g" tests/env.cfg
       - run: sed -i -e '/kube_http_scheme/c\kube_http_scheme=https' -e "/kube_master_ip/c\kube_master_ip=${KUBE_MASTER_IP}" -e "/kube_master_port/c\kube_master_port=${KUBE_MASTER_PORT}" make/board.cfg 
