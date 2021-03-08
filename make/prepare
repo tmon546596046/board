@@ -56,7 +56,11 @@ def create_cert(conf_path, key_path="/data/board/cert/board-key.pem", cert_path=
 	cert_dir = os.path.dirname(cert_path)
 	csr_path = os.path.join(cert_dir, "request.csr")
 	print(subprocess.check_output("openssl genrsa -out " + key_path +" 2048", stderr=subprocess.STDOUT, shell=True))
-	print(subprocess.check_output("openssl req -new -key " + key_path + " -out " + csr_path + " -config " + conf_path, stderr=subprocess.STDOUT, shell=True))
+	try:
+		print(subprocess.check_output("openssl req -new -key " + key_path + " -out " + csr_path + " -config " + conf_path, stderr=subprocess.STDOUT, shell=True))
+	except subprocess.CalledProcessError as e:
+		print(e.output)
+		exit(1)
 	print(subprocess.check_output("openssl x509 -req -in " + csr_path + " -CA " + ca_cert + " -CAkey " + ca_key + " -CAcreateserial -out " + cert_path + " -days 10000 -extensions v3_ext -extfile " + conf_path, stderr=subprocess.STDOUT, shell=True))
         return 0
 
