@@ -49,9 +49,8 @@ jobs:
       - run: sudo docker cp kind-control-plane:/etc/kubernetes/pki/ca.crt /etc/board/cert/ca.pem
       - run: sudo docker cp kind-control-plane:/etc/kubernetes/pki/ca.key /etc/board/cert/ca-key.pem
       - run: export KUBE_MASTER_PORT=6443
-      - run: export KUBE_MASTER_IP=$(docker inspect kind-control-plane  -f '{{.NetworkSettings.Networks.kind.IPAddress}}')
+      - run: while true; do masterip=$(docker inspect kind-control-plane  -f '{{.NetworkSettings.Networks.kind.IPAddress}}'); if [ -n "$masterip" ]; then break; fi; sleep 2; done && export KUBE_MASTER_IP=$(docker inspect kind-control-plane  -f '{{.NetworkSettings.Networks.kind.IPAddress}}')
       - run: echo "master ip is $KUBE_MASTER_IP"
-      - run: docker inspect kind-control-plane
       - run: sed -i -e 's/KUBE_MASTER_IP=10.110.27.103/KUBE_MASTER_IP=${KUBE_MASTER_IP}/g' -e "s/KUBE_MASTER_PORT=51926/KUBE_MASTER_PORT=${KUBE_MASTER_PORT}/g" -e "s/NODE_IP=10.110.27.103/NODE_IP=kind-control-plane/g" tests/env.cfg
       - run: sed -i -e '/kube_http_scheme/c\kube_http_scheme=https' -e "/kube_master_ip/c\kube_master_ip=${KUBE_MASTER_IP}" -e "/kube_master_port/c\kube_master_port=${KUBE_MASTER_PORT}" make/board.cfg 
       - run: docker-compose -f tests/docker-compose.uibuilder.test.yml up
